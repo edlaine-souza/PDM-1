@@ -46,7 +46,9 @@ Desenvolvido com **React Native (Expo)** no frontend e **Node.js + PostgreSQL** 
    ```bash
    npx expo start
    ```
-4. Escaneie o QR code no terminal com o aplicativo **Expo Go** (Android/iOS)  
+4. Na pasta Service, api.ts, // ✅ SEU IP - Backend real: const API_BASE_URL = 'http://IP real da sua máquina:3000/api';.
+    
+5. Escaneie o QR code no terminal com o aplicativo **Expo Go** (Android/iOS)  
    ou use um **emulador**.
 
 ---
