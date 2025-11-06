@@ -23,12 +23,14 @@ Desenvolvido com **React Native (Expo)** no frontend e **Node.js + PostgreSQL** 
    DB_HOST=localhost
    DB_PORT=5432
    DB_NAME=app_scholar
-   JWT_SECRET=sua_chave_secreta
+   JWT_SECRET=sua_chave_secreta // coloque aqui a senha do seu banco 
    ```
 4. Inicie o servidor:
    ```bash
    npm run dev
    ```
+5. Na pasta database/ config.ts = coloque a senha do seu banco de dados 
+
 > O backend rodará em **http://localhost:3000**
 
 ---
@@ -46,7 +48,7 @@ Desenvolvido com **React Native (Expo)** no frontend e **Node.js + PostgreSQL** 
    ```bash
    npx expo start
    ```
-4. Na pasta Service, api.ts, // ✅ SEU IP - Backend real: const API_BASE_URL = 'http://IP real da sua máquina:3000/api';.
+4. Na pasta Service, api.ts: // ✅ SEU IP - Backend real: const API_BASE_URL = 'http://IP coloque o ip real da sua máquina:3000/api';.
     
 5. Escaneie o QR code no terminal com o aplicativo **Expo Go** (Android/iOS)  
    ou use um **emulador**.
