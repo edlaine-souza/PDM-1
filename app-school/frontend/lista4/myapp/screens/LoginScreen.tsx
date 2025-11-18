@@ -117,6 +117,14 @@ export default function LoginScreen({ navigation }: any) {
           <Text style={styles.demoText}>Aluno: aluno@app.com / 1234</Text>
         </View>
       </View>
+      <View style={styles.cadastroContainer}>
+        <Text style={styles.cadastroText}>Não tem uma conta?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('CadastroUsuario')}>
+        <Text style={styles.cadastroLink}>Cadastre-se aqui</Text>
+      </TouchableOpacity>
+</View>
+
+      
     </KeyboardAvoidingView>
   );
 }
@@ -210,4 +218,21 @@ const styles = StyleSheet.create({
     color: '#2D3142',
     marginBottom: 4,
   },
+  cadastroContainer: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 24,
+  padding: 16,
+},
+cadastroText: {
+  fontSize: 14,
+  color: '#6C757D',
+  marginRight: 4,
+},
+cadastroLink: {
+  fontSize: 14,
+  color: '#2E86AB',
+  fontWeight: '600',
+},
 });

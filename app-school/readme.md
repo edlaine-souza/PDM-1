@@ -1,70 +1,51 @@
 # 📚 App Scholar
 
-Aplicativo mobile para **gerenciamento de boletins acadêmicos** de instituições de graduação tecnológica.  
-Desenvolvido com **React Native (Expo)** no frontend e **Node.js + PostgreSQL** no backend.
+Aplicativo mobile para gerenciamento de boletins acadêmicos, desenvolvido com React Native (Expo) no frontend e Node.js + PostgreSQL no backend.
 
 ---
 
 ## 🚀 Como executar o projeto
 
 ### 🔹 Backend
-1. Acesse a pasta do backend:
-   ```bash
-   cd backend
-   ```
-2. Instale as dependências:
-   ```bash
-   npm install
-   ```
-3. Configure o banco de dados PostgreSQL no arquivo `.env`:
-   ```env
-   DB_USER=seu_usuario
-   DB_PASSWORD=sua_senha
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_NAME=app_scholar
-   JWT_SECRET=sua_chave_secreta // coloque aqui a senha do seu banco 
-   ```
-4. Inicie o servidor:
-   ```bash
-   npm run dev
-   ```
-5. Na pasta database/ config.ts = coloque a senha do seu banco de dados 
 
-> O backend rodará em **http://localhost:3000**
+Instalação:
+cd backend
+npm install
 
----
+Configuração:
+Crie o arquivo .env com as informações do seu banco de dados:
+
+DB_USER=seu_usuario
+DB_PASSWORD=sua_senha_do_postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=app_scholar
+JWT_SECRET=sua_chave_secreta
+
+No arquivo database/config.ts, coloque também a senha do seu banco de dados.
+
+Executar:
+npm run dev
+
+O backend ficará disponível em:
+http://localhost:3000
+
 
 ### 🔹 Frontend
-1. Acesse a pasta do frontend:
-   ```bash
-   cd frontend
-   ```
-2. Instale as dependências:
-   ```bash
-   npm install
-   ```
-3. Inicie o aplicativo com Expo:
-   ```bash
-   npx expo start
-   ```
-4. Na pasta Service, api.ts: // ✅ SEU IP - Backend real: const API_BASE_URL = 'http://IP coloque o ip real da sua máquina:3000/api';.
-    
-5. Escaneie o QR code no terminal com o aplicativo **Expo Go** (Android/iOS)  
-   ou use um **emulador**.
 
----
+Instalação:
+cd frontend
+npm install
 
-## ⚙️ Funcionalidades da Entrega 1
-- Estrutura do projeto criada no **Expo.dev**  
-- Conexão inicial com o **PostgreSQL**  
-- **Sistema de login e autenticação de usuários**  
-- **Primeira API** implementada com JWT  
+Configuração da API:
+No arquivo Service/api.ts, configure o IP da sua máquina:
+export const API_BASE_URL = "http://SEU_IP_AQUI:3000/api";
 
----
+Substitua SEU_IP_AQUI pelo IP local obtido com ipconfig (Windows) ou ifconfig (Linux/Mac).
 
-## 👩‍💻 Tecnologias Utilizadas
-- **React Native + Expo**  
-- **Node.js + Express**  
-- **PostgreSQL**  
-- **JWT + bcryptjs**
+Executar:
+npx expo start ou npm start
+
+
+
+

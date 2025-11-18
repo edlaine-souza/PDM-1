@@ -3,13 +3,15 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import LoginScreen from './lista4/myapp/screens/LoginScreen';
 import HomeScreen from './lista4/myapp/screens/HomeScreen';
-import BoletimScreen from './lista4/myapp/screens/BoletimScreen';
+import BoletimCompletoScreen from './lista4/myapp/screens/BoletimCompletoScreen';
 import CadastroAlunoScreen from './lista4/myapp/screens/CadastroAlunoScreen';
 import CadastroProfessorScreen from './lista4/myapp/screens/CadastroProfessorScreen';
 import CadastroDisciplinaScreen from './lista4/myapp/screens/CadastroDisciplinaScreen';
+import CadastroNotasScreen from './lista4/myapp/screens/CadastroNotasScreen'; 
+import ListaAlunosScreen from './lista4/myapp/screens/ListaAlunosScreen';
+import CadastroUsuarioScreen from './lista4/myapp/screens/CadastroUsuarioScreen';
 
 const Stack = createStackNavigator();
 
@@ -73,6 +75,11 @@ export default function App() {
           }
         }}
       >
+        <Stack.Screen 
+          name="CadastroUsuario" 
+          component={CadastroUsuarioScreen} 
+          options={{ title: 'Cadastrar Usuário' }}
+        />
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -88,9 +95,9 @@ export default function App() {
           initialParams={{ perfil }}
         />
         <Stack.Screen 
-          name="Boletim" 
-          component={BoletimScreen} 
-          options={{ title: 'Consultar Boletim' }}
+          name="BoletimCompleto" 
+          component={BoletimCompletoScreen} 
+          options={{ title: 'Boletim Acadêmico' }}
         />
         <Stack.Screen 
           name="CadastroAluno" 
@@ -106,6 +113,16 @@ export default function App() {
           name="CadastroDisciplina" 
           component={CadastroDisciplinaScreen} 
           options={{ title: 'Cadastrar Disciplina' }}
+        />
+        <Stack.Screen 
+          name="CadastroNotas" 
+          component={CadastroNotasScreen} 
+          options={{ title: 'Cadastrar Notas' }}
+        />
+        <Stack.Screen 
+          name="ListaAlunos" 
+          component={ListaAlunosScreen} 
+          options={{ title: 'Lista de Alunos' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

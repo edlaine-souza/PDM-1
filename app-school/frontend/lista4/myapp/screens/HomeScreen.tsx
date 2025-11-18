@@ -68,33 +68,90 @@ export default function HomeScreen({ navigation, route }: any) {
       <View style={styles.menuSection}>
         <Text style={styles.sectionTitle}>Menu Principal</Text>
         
+        {/* Menu para todos os perfis */}
         <MenuButton 
-          title="Visualizar Boletim" 
+          title="Boletim Acadêmico" 
           icon="school" 
-          onPress={() => navigation.navigate('Boletim')} 
+          onPress={() => navigation.navigate('BoletimCompleto')} 
         />
 
+        {/* Menu para PROFESSOR e ADMIN */}
         {(perfil === 'admin' || perfil === 'professor') && (
-          <MenuButton 
-            title="Cadastrar Disciplina" 
-            icon="book" 
-            onPress={() => navigation.navigate('CadastroDisciplina')} 
-          />
+          <>
+            <MenuButton 
+              title="Cadastrar Notas" 
+              icon="document-text" 
+              color="#27AE60"
+              onPress={() => navigation.navigate('CadastroNotas')} 
+            />
+            <MenuButton 
+              title="Cadastrar Disciplina" 
+              icon="book" 
+              color="#F39C12"
+              onPress={() => navigation.navigate('CadastroDisciplina')} 
+            />
+          </>
         )}
 
+        {/* Menu exclusivo para ADMIN */}
         {perfil === 'admin' && (
           <>
             <MenuButton 
+              title="Cadastrar Usuário" 
+              icon="person-add" 
+              color="#9B59B6"
+              onPress={() => navigation.navigate('CadastroUsuario')} 
+            />
+            <MenuButton 
               title="Cadastrar Aluno" 
-              icon="people" 
+              icon="person-add" 
+              color="#9B59B6"
               onPress={() => navigation.navigate('CadastroAluno')} 
+            />
+            <MenuButton 
+              title="Lista de Alunos" 
+              icon="list" 
+              color="#3498DB"
+              onPress={() => navigation.navigate('ListaAlunos')} 
             />
             <MenuButton 
               title="Cadastrar Professor" 
               icon="person-add" 
+              color="#E74C3C"
               onPress={() => navigation.navigate('CadastroProfessor')} 
             />
           </>
+        )}
+      </View>
+
+      <View style={styles.infoSection}>
+        <Text style={styles.infoTitle}>Informações do Sistema</Text>
+        
+        {perfil === 'professor' && (
+          <View style={styles.infoCard}>
+            <Ionicons name="information-circle" size={20} color="#2E86AB" />
+            <Text style={styles.infoText}>
+              Como professor, você pode cadastrar notas para os alunos e gerenciar suas disciplinas.
+            </Text>
+          </View>
+        )}
+
+        {perfil === 'admin' && (
+          <View style={styles.infoCard}>
+            <Ionicons name="information-circle" size={20} color="#2E86AB" />
+            <Text style={styles.infoText}>
+              Como administrador, você tem acesso completo ao sistema para gerenciar alunos, professores e disciplinas.
+            </Text>
+          </View>
+        )}
+
+        {perfil === 'aluno' && (
+          <View style={styles.infoCard}>
+            <Ionicons name="information-circle" size={20} color="#2E86AB" />
+            <Text style={styles.infoText}>
+              Como aluno, você pode visualizar seu boletim acadêmico.
+            </Text>
+          </View>
         )}
       </View>
 
@@ -116,6 +173,8 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: '#FFFFFF',
     marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9ECEF',
   },
   avatar: {
     width: 80,
@@ -125,23 +184,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
+    borderWidth: 3,
+    borderColor: '#2E86AB',
   },
   welcome: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#2D3142',
     marginBottom: 8,
+    textAlign: 'center',
   },
   perfilBadge: {
     backgroundColor: '#2E86AB',
     paddingHorizontal: 16,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   perfilText: {
     color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '600',
   },
   menuSection: {
     backgroundColor: '#FFFFFF',
@@ -149,19 +211,30 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 12,
     padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6C757D',
-    marginBottom: 12,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2D3142',
+    marginBottom: 16,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9ECEF',
   },
   menuButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F3F4',
+    borderBottomColor: '#F8F9FA',
   },
   iconContainer: {
     width: 40,
@@ -177,6 +250,43 @@ const styles = StyleSheet.create({
     color: '#2D3142',
     fontWeight: '500',
   },
+  infoSection: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  infoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2D3142',
+    marginBottom: 12,
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#E3F2FD',
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2E86AB',
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#2D3142',
+    marginLeft: 8,
+    lineHeight: 20,
+  },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -187,11 +297,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E74C3C',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   logoutText: {
     color: '#E74C3C',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
     marginLeft: 8,
   },
 });
