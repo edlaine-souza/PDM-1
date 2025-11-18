@@ -8,43 +8,44 @@ Aplicativo mobile para gerenciamento de boletins acadêmicos, desenvolvido com R
 
 ### 🔹 Backend
 
-Instalação:
-cd backend
-npm install
+# Instalação:
+<p>cd backend</p>
+<p>npm install</p>
 
-Configuração:
-Crie o arquivo .env com as informações do seu banco de dados:
+# Configuração:
+<h3>Crie o arquivo .env com:</h3>
+<p>DB_USER=seu_usuario</p>
+<p>DB_PASSWORD=sua_senha_do_postgres</p>
+<p>DB_HOST=localhost</p>
+<p>DB_PORT=5432</p>
+<p>DB_NAME=app_scholar</p>
+<p>JWT_SECRET=sua_chave_secreta</p>
 
-DB_USER=seu_usuario
-DB_PASSWORD=sua_senha_do_postgres
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=app_scholar
-JWT_SECRET=sua_chave_secreta
+<p>No arquivo database/config.ts, coloque também a senha do seu banco de dados.</p>
 
-No arquivo database/config.ts, coloque também a senha do seu banco de dados.
+# Executar:
+<p>npm run dev</p>
 
-Executar:
-npm run dev
+<h3>Backend disponível em:</h3>
+<p>http://localhost:3000</p>
 
-O backend ficará disponível em:
-http://localhost:3000
-
+---
 
 ### 🔹 Frontend
 
-Instalação:
-cd frontend
-npm install
+# Instalação:
+<p>cd frontend</p>
+<p>npm install</p>
 
-Configuração da API:
-No arquivo Service/api.ts, configure o IP da sua máquina:
-export const API_BASE_URL = "http://SEU_IP_AQUI:3000/api";
+# Configuração da API:
+<h3>Defina no arquivo Service/api.ts:</h3>
+<p>export const API_BASE_URL = "http://SEU_IP_AQUI:3000/api";</p>
+<p>Substitua SEU_IP_AQUI pelo seu IP local.</p>
 
-Substitua SEU_IP_AQUI pelo IP local obtido com ipconfig (Windows) ou ifconfig (Linux/Mac).
-
-Executar:
-npx expo start ou npm start
+# Executar:
+<p>npx expo start</p>
+<p>ou</p>
+<p>npm start</p>
 
 
 
