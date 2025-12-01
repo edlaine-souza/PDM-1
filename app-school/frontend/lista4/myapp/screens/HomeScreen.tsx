@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -10,9 +10,26 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import api from '../services/api';
 
 export default function HomeScreen({ navigation, route }: any) {
   const perfil = route.params?.perfil || 'aluno';
+  const [unreadAvisos, setUnreadAvisos] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      const checkUnreadAvisos = async () => {
+        try {
+          const res = await api.getUnreadAvisosCount();
+          setUnreadAvisos(res.data?.total || 0);
+        } catch (err) {
+          console.error('Erro ao verificar avisos:', err);
+        }
+      };
+      checkUnreadAvisos();
+    }, [])
+  );
 
   const getPerfilName = () => {
     switch(perfil) {
@@ -43,21 +60,37 @@ export default function HomeScreen({ navigation, route }: any) {
     ]);
   };
 
-  const MenuButton = ({ title, onPress, icon, color = '#2E86AB' }: any) => (
-    <TouchableOpacity style={styles.menuButton} onPress={onPress}>
-      <View style={[styles.iconContainer, { backgroundColor: color }]}>
-        <Ionicons name={icon} size={24} color="#FFFFFF" />
-      </View>
-      <Text style={styles.menuText}>{title}</Text>
-      <Ionicons name="chevron-forward" size={20} color="#6C757D" />
-    </TouchableOpacity>
+  const MenuButton = ({ title, onPress, icon, color = '#2E86AB', badgeCount = 0 }: any) => (
+    <View style={styles.menuItemWithBadge}>
+      <TouchableOpacity style={styles.menuButton} onPress={onPress}>
+        <View style={[styles.iconContainer, { backgroundColor: color }]}>
+          <Ionicons name={icon} size={24} color="#FFFFFF" />
+        </View>
+        <Text style={styles.menuText}>{title}</Text>
+        <Ionicons name="chevron-forward" size={20} color="#6C757D" />
+      </TouchableOpacity>
+      {badgeCount > 0 && (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>
+            {badgeCount > 99 ? '99+' : badgeCount}
+          </Text>
+        </View>
+      )}
+    </View>
   );
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.avatar}>
-          <Ionicons name="person" size={32} color="#2E86AB" />
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatar}>
+            <Ionicons name="person" size={32} color="#2E86AB" />
+          </View>
+          {unreadAvisos > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationText}>{unreadAvisos}</Text>
+            </View>
+          )}
         </View>
         <Text style={styles.welcome}>Bem-vindo ao App Scholar</Text>
         <View style={styles.perfilBadge}>
@@ -73,6 +106,15 @@ export default function HomeScreen({ navigation, route }: any) {
           title="Boletim Acadêmico" 
           icon="school" 
           onPress={() => navigation.navigate('BoletimCompleto')} 
+        />
+
+        {/* Menu de Avisos para todos os perfis */}
+        <MenuButton 
+          title="Avisos Acadêmicos" 
+          icon="megaphone" 
+          color="#9B59B6"
+          badgeCount={unreadAvisos}
+          onPress={() => navigation.navigate('ListaAvisos')} 
         />
 
         {/* Menu para PROFESSOR e ADMIN */}
@@ -131,7 +173,7 @@ export default function HomeScreen({ navigation, route }: any) {
           <View style={styles.infoCard}>
             <Ionicons name="information-circle" size={20} color="#2E86AB" />
             <Text style={styles.infoText}>
-              Como professor, você pode cadastrar notas para os alunos e gerenciar suas disciplinas.
+              Como professor, você pode cadastrar notas para os alunos, gerenciar suas disciplinas e publicar avisos acadêmicos.
             </Text>
           </View>
         )}
@@ -140,7 +182,7 @@ export default function HomeScreen({ navigation, route }: any) {
           <View style={styles.infoCard}>
             <Ionicons name="information-circle" size={20} color="#2E86AB" />
             <Text style={styles.infoText}>
-              Como administrador, você tem acesso completo ao sistema para gerenciar alunos, professores e disciplinas.
+              Como administrador, você tem acesso completo ao sistema para gerenciar alunos, professores, disciplinas e avisos.
             </Text>
           </View>
         )}
@@ -149,7 +191,16 @@ export default function HomeScreen({ navigation, route }: any) {
           <View style={styles.infoCard}>
             <Ionicons name="information-circle" size={20} color="#2E86AB" />
             <Text style={styles.infoText}>
-              Como aluno, você pode visualizar seu boletim acadêmico.
+              Como aluno, você pode visualizar seu boletim acadêmico e acompanhar os avisos importantes da instituição.
+            </Text>
+          </View>
+        )}
+
+        {unreadAvisos > 0 && (
+          <View style={[styles.infoCard, { backgroundColor: '#FFF3CD', borderLeftColor: '#FFC107' }]}>
+            <Ionicons name="notifications" size={20} color="#F39C12" />
+            <Text style={styles.infoText}>
+              Você tem {unreadAvisos} aviso(s) não lido(s). Clique em "Avisos Acadêmicos" para visualizar.
             </Text>
           </View>
         )}
@@ -176,6 +227,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E9ECEF',
   },
+  avatarContainer: {
+    position: 'relative',
+  },
   avatar: {
     width: 80,
     height: 80,
@@ -186,6 +240,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 3,
     borderColor: '#2E86AB',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#E74C3C',
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  notificationText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   welcome: {
     fontSize: 20,
@@ -229,12 +302,32 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E9ECEF',
   },
+  menuItemWithBadge: {
+    position: 'relative',
+  },
   menuButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#F8F9FA',
+  },
+  badge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#E74C3C',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   iconContainer: {
     width: 40,
@@ -279,6 +372,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderLeftWidth: 4,
     borderLeftColor: '#2E86AB',
+    marginBottom: 8,
   },
   infoText: {
     flex: 1,

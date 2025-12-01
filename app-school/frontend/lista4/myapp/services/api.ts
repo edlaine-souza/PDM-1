@@ -94,4 +94,20 @@ export default {
   // Busca de alunos para sugestões (OPCIONAL)
   buscarAlunos: (termo: string) =>
     api.get(`/alunos/busca/${encodeURIComponent(termo)}`),
+
+  // Avisos
+  listAvisos: () => 
+    api.get('/avisos'),
+
+  createAviso: (payload: any) => 
+    api.post('/avisos', payload),
+
+  markAvisoAsRead: (id: number) => 
+    api.post(`/avisos/${id}/ler`, {}),
+
+  getUnreadAvisosCount: () => 
+    api.get('/avisos/nao-lidos'),
+
+  deleteAviso: (id: number) => 
+    api.delete(`/avisos/${id}`),
 };

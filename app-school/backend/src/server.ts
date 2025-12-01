@@ -736,6 +736,191 @@ app.get('/api/debug/alunos', authMiddleware, async (req: express.Request, res: e
   }
 });
 
+// ==================== AVISOS ACADÊMICOS ====================
+
+// Criar novo aviso (admin e professor)
+app.post('/api/avisos', authMiddleware, async (req: express.Request, res: express.Response) => {
+  try {
+    const user = (req as any).user;
+    const { titulo, mensagem, tipo, data_expiracao } = req.body;
+
+    // Verificar permissão
+    if (user.perfil !== 'admin' && user.perfil !== 'professor') {
+      res.status(403).json({ message: 'Apenas administradores e professores podem criar avisos' });
+      return;
+    }
+
+    if (!titulo || !mensagem || !tipo) {
+      res.status(400).json({ message: 'Título, mensagem e tipo são obrigatórios' });
+      return;
+    }
+
+    // Validar tipo
+    const tiposValidos = ['geral', 'importante', 'alerta', 'informacao'];
+    if (!tiposValidos.includes(tipo)) {
+      res.status(400).json({ message: 'Tipo de aviso inválido' });
+      return;
+    }
+
+    const result = await pool.query(
+      `INSERT INTO avisos (titulo, mensagem, tipo, autor_id, data_expiracao) 
+       VALUES ($1, $2, $3, $4, $5) 
+       RETURNING *`,
+      [titulo, mensagem, tipo, user.id, data_expiracao || null]
+    );
+
+    console.log(`📢 Novo aviso criado: "${titulo}" por ${user.email}`);
+
+    res.status(201).json({
+      message: 'Aviso publicado com sucesso',
+      aviso: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Erro ao criar aviso:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+});
+
+// Listar avisos (todos os perfis)
+app.get('/api/avisos', authMiddleware, async (req: express.Request, res: express.Response) => {
+  try {
+    const user = (req as any).user;
+    
+    // Buscar avisos não expirados
+    const result = await pool.query(`
+      SELECT 
+        a.id,
+        a.titulo,
+        a.mensagem,
+        a.tipo,
+        a.autor_id,
+        u.nome as autor_nome,
+        a.data_publicacao,
+        a.data_expiracao,
+        a.lido_por,
+        a.created_at,
+        $1 = ANY(a.lido_por) as lido
+      FROM avisos a
+      LEFT JOIN usuarios u ON a.autor_id = u.id
+      WHERE (a.data_expiracao IS NULL OR a.data_expiracao > NOW())
+      ORDER BY 
+        CASE a.tipo 
+          WHEN 'importante' THEN 1
+          WHEN 'alerta' THEN 2
+          WHEN 'informacao' THEN 3
+          ELSE 4
+        END,
+        a.data_publicacao DESC
+    `, [user.id]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar avisos:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+});
+
+// Marcar aviso como lido
+app.post('/api/avisos/:id/ler', authMiddleware, async (req: express.Request, res: express.Response) => {
+  try {
+    const user = (req as any).user;
+    const { id } = req.params;
+
+    // Verificar se aviso existe
+    const avisoResult = await pool.query(
+      'SELECT id, lido_por FROM avisos WHERE id = $1',
+      [id]
+    );
+
+    if (avisoResult.rows.length === 0) {
+      res.status(404).json({ message: 'Aviso não encontrado' });
+      return;
+    }
+
+    const aviso = avisoResult.rows[0];
+    let lidoPor = aviso.lido_por || [];
+
+    // Se ainda não foi lido por este usuário, adicionar
+    if (!lidoPor.includes(user.id)) {
+      lidoPor.push(user.id);
+      
+      await pool.query(
+        'UPDATE avisos SET lido_por = $1 WHERE id = $2',
+        [lidoPor, id]
+      );
+
+      console.log(`📝 Aviso ${id} marcado como lido pelo usuário ${user.email}`);
+    }
+
+    res.json({ 
+      message: 'Aviso marcado como lido',
+      lido: true 
+    });
+
+  } catch (error) {
+    console.error('Erro ao marcar aviso como lido:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+});
+
+// Contar avisos não lidos
+app.get('/api/avisos/nao-lidos', authMiddleware, async (req: express.Request, res: express.Response) => {
+  try {
+    const user = (req as any).user;
+    
+    const result = await pool.query(`
+      SELECT COUNT(*) as total
+      FROM avisos a
+      WHERE (a.data_expiracao IS NULL OR a.data_expiracao > NOW())
+      AND NOT ($1 = ANY(a.lido_por))
+    `, [user.id]);
+
+    const totalNaoLidos = parseInt(result.rows[0].total);
+
+    res.json({ 
+      total: totalNaoLidos,
+      hasUnread: totalNaoLidos > 0
+    });
+  } catch (error) {
+    console.error('Erro ao contar avisos não lidos:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+});
+
+// Excluir aviso (apenas admin)
+app.delete('/api/avisos/:id', authMiddleware, async (req: express.Request, res: express.Response) => {
+  try {
+    const user = (req as any).user;
+    
+    if (user.perfil !== 'admin') {
+      res.status(403).json({ message: 'Apenas administradores podem excluir avisos' });
+      return;
+    }
+
+    const { id } = req.params;
+
+    const result = await pool.query(
+      'DELETE FROM avisos WHERE id = $1 RETURNING id',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ message: 'Aviso não encontrado' });
+      return;
+    }
+
+    res.json({ 
+      message: 'Aviso excluído com sucesso',
+      id: result.rows[0].id
+    });
+
+  } catch (error) {
+    console.error('Erro ao excluir aviso:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+});
+
 // Inicialização do Banco de Dados
 const initializeDatabase = async (): Promise<void> => {
   try {
@@ -793,6 +978,21 @@ const initializeDatabase = async (): Promise<void> => {
         nota2 DECIMAL(4,2) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(aluno_id, disciplina_id)
+      );
+    `);
+
+    // Criar tabela de avisos
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS avisos (
+        id SERIAL PRIMARY KEY,
+        titulo VARCHAR(255) NOT NULL,
+        mensagem TEXT NOT NULL,
+        tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('geral', 'importante', 'alerta', 'informacao')),
+        autor_id INTEGER REFERENCES usuarios(id),
+        data_publicacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        data_expiracao TIMESTAMP,
+        lido_por INTEGER[] DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
